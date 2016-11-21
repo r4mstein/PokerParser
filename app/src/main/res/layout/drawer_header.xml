@@ -14,7 +14,7 @@
         android:padding="16dp"
         android:gravity="end"
         style="@style/TextAppearance.AppCompat.Title"
-        android:text="Hello KoJIeНЬKa"
+        android:text="@string/drawer_header_text"
         android:textStyle="bold"/>
 
 </FrameLayout>

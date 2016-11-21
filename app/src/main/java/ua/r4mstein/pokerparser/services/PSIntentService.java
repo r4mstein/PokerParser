@@ -65,11 +65,7 @@ public class PSIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-//        if (!isNetworkAvailableAndConnected()) {
-//            Toast.makeText(getApplicationContext(), "Network Not Available",
-//                    Toast.LENGTH_SHORT).show();
-//            return;
-//        }
+
         Log.i(TAG, "onHandlePS_Intent: " + intent);
 
         if (intent != null) {
@@ -99,19 +95,11 @@ public class PSIntentService extends IntentService {
                 for (int j = 0; j < 5; j++) {
                     if (!(myModelsFromShared.contains(myModels.get(j)))) {
 
-//                            !(myModels.get(j).getLinkTitle().equals(myModel.getLinkTitle()))
                         Resources resources = getResources();
                         Intent notificationIntent = new Intent(Intent.ACTION_VIEW,
                                 Uri.parse(myModels.get(j).getLink()));
                         PendingIntent pi = PendingIntent.getActivity(this, 0,
                                 notificationIntent, 0);
-
-//                        NotificationCompat.BigTextStyle bigTextStyle =
-//                                new NotificationCompat.BigTextStyle();
-//                        bigTextStyle.setBigContentTitle(resources.getString(R.string.new_topic_ps));
-//                        bigTextStyle.bigText(myModels.get(j).getLinkTitle() + " User: "
-//                                + myModels.get(j).getUser());
-//                        android.R.drawable.ic_menu_report_image
 
                         Notification notification = new NotificationCompat.Builder(this)
                                 .setTicker(resources.getString(R.string.new_topic_ps))

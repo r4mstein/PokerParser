@@ -8,12 +8,6 @@ public class MyModel {
     private String link;
     private String user;
 
-////    public MyModel(String linkTitle, String link, String user) {
-////        this.linkTitle = linkTitle;
-////        this.link = link;
-////        this.user = user;
-//    }
-
     public String serializeMyModel() {
         Gson gson = new Gson();
         return gson.toJson(this);

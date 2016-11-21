@@ -85,7 +85,6 @@ public class GTIntentService extends IntentService {
                     MyModel myModel = MyModel.createMyModel(modelFromPref);
 
                     myModelsFromShared.add(myModel);
-//                    Log.i(TAG, myModel.toString());
                     Log.i(TAG, "GT_MyModelFromShared -- " + myModel.getLinkTitle() +
                             " : " + myModel.getUser());
                 }
@@ -93,18 +92,11 @@ public class GTIntentService extends IntentService {
                 for (int j = 0; j < 5; j++) {
                     if (!(myModelsFromShared.contains(myModels.get(j)))) {
 
-//                            !(myModels.get(j).getLinkTitle().equals(myModel.getLinkTitle()))
                         Resources resources = getResources();
                         Intent notificationIntent = new Intent(Intent.ACTION_VIEW,
                                 Uri.parse(myModels.get(j).getLink()));
                         PendingIntent pi = PendingIntent.getActivity(this, 0,
                                 notificationIntent, 0);
-
-//                        NotificationCompat.BigTextStyle bigTextStyle =
-//                                new NotificationCompat.BigTextStyle();
-//                        bigTextStyle.setBigContentTitle(resources.getString(R.string.new_topic_gt));
-//                        bigTextStyle.bigText(myModels.get(j).getLinkTitle() + " User: "
-//                                + myModels.get(j).getUser());
 
                         Notification notification = new NotificationCompat.Builder(this)
                                 .setTicker(resources.getString(R.string.new_topic_gt))
