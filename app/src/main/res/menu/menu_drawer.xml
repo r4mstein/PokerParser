@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/group_1"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_item_1"
+            android:icon="@mipmap/ic_numeric_1_box"
+            android:title="@string/ps_link_1"/>
+
+        <item
+            android:id="@+id/nav_item_2"
+            android:icon="@mipmap/ic_numeric_2_box"
+            android:title="@string/ps_link_2"/>
+        <item
+            android:id="@+id/nav_item_3"
+            android:icon="@mipmap/ic_numeric_3_box"
+            android:title="@string/ps_link_3"/>
+
+        <item
+            android:id="@+id/nav_item_4"
+            android:icon="@mipmap/ic_numeric_4_box"
+            android:title="@string/ps_link_4"/>
+
+    </group>
+
+    <group
+        android:id="@+id/group_2"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_item_5"
+            android:icon="@mipmap/ic_numeric_5_box"
+            android:title="@string/gt_link_1"/>
+
+        <item
+            android:id="@+id/nav_item_6"
+            android:icon="@mipmap/ic_numeric_6_box"
+            android:title="@string/gt_link_2"/>
+
+    </group>
+
+    <group
+        android:id="@+id/group_3"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_item_7"
+            android:icon="@mipmap/ic_numeric_7_box"
+            android:title="@string/start_stop_ps_monitoring" />
+
+        <item
+            android:id="@+id/nav_item_8"
+            android:icon="@mipmap/ic_numeric_8_box"
+            android:title="@string/start_stop_gt_monitoring" />
+
+    </group>
+
+</menu>

@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Poker Parser</string>
+
+    <string name="ps_link_1">PS: Пакеты от $50 до $500</string>
+    <string name="ps_link_2">PS: Пакеты в $500 и дороже</string>
+    <string name="ps_link_3">PS: Долгосрочный бэкинг</string>
+    <string name="ps_link_4">PS: Пакеты дешевле $50</string>
+    <string name="gt_link_1">GT: Лимиты до $100</string>
+    <string name="gt_link_2">GT: Лимиты от $100</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="start_stop_ps_monitoring">Start / Stop PS_Monitoring</string>
+    <string name="start_stop_gt_monitoring">Start / Stop GT_Monitoring</string>
+    <string name="new_topic_ps">New Topic on PS</string>
+    <string name="new_topic_gt">New Topic on GT</string>
+    <string name="ps_monitor_off">PS: Off</string>
+    <string name="ps_monitor_on">PS: On</string>
+    <string name="gt_monitor_off">GT: Off</string>
+    <string name="gt_monitor_on">GT: On</string>
+    <string name="monitor_status">Monitor Status:</string>
+</resources>
