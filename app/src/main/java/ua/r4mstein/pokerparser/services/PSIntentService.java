@@ -68,64 +68,79 @@ public class PSIntentService extends IntentService {
 
         Log.i(TAG, "onHandlePS_Intent: " + intent);
 
-        if (intent != null) {
+        if (MainActivity.isConnected(getApplicationContext())) {
+            if (intent != null) {
 
-            myModels.clear();
-            GetData.getDataFromPSLinks(MainActivity.PS_LINK_1, myModels);
-            MainActivity.deleteItemsFromList(myModels);
+                myModels.clear();
+                GetData.getDataFromPSLinks(MainActivity.PS_LINK_1, myModels);
+                MainActivity.deleteItemsFromList(myModels);
 
-            mPreferences = getSharedPreferences(MODELS_FROM_PS_LINK1,
-                    getApplicationContext().MODE_PRIVATE);
-            SharedPreferences.Editor editor = mPreferences.edit();
+                mPreferences = getSharedPreferences(MODELS_FROM_PS_LINK1,
+                        getApplicationContext().MODE_PRIVATE);
+                SharedPreferences.Editor editor = mPreferences.edit();
 
-            if (didFirstMonitoring()) {
-                addModelToSharedPreferences(editor, myModels);
-                markNotFirstMonitoring();
-            } else {
-                myModelsFromShared.clear();
-                for (int i = 0; i < 5; i++) {
-                    String modelFromPref = mPreferences.getString(KEY_PS_LINK + i, null);
-                    MyModel myModel = MyModel.createMyModel(modelFromPref);
+                if (didFirstMonitoring()) {
+                    addModelToSharedPreferences(editor, myModels);
+                    markNotFirstMonitoring();
+                } else {
+                    myModelsFromShared.clear();
+                    for (int i = 0; i < 5; i++) {
+                        String modelFromPref = mPreferences.getString(KEY_PS_LINK + i, null);
+                        MyModel myModel = MyModel.createMyModel(modelFromPref);
 
-                    myModelsFromShared.add(myModel);
-                    Log.i(TAG, "SP_MyModelFromShared -- " + myModel.getLinkTitle() +
-                            " : " + myModel.getUser());
-                }
-
-                for (int j = 0; j < 5; j++) {
-                    if (!(myModelsFromShared.contains(myModels.get(j)))) {
-
-                        Resources resources = getResources();
-                        Intent notificationIntent = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(myModels.get(j).getLink()));
-                        PendingIntent pi = PendingIntent.getActivity(this, 0,
-                                notificationIntent, 0);
-
-                        Notification notification = new NotificationCompat.Builder(this)
-                                .setTicker(resources.getString(R.string.new_topic_ps))
-                                .setSmallIcon(R.mipmap.ic_launcher_ps)
-                                .setContentTitle(resources.getString(R.string.new_topic_ps))
-                                .setContentText(myModels.get(j).getLinkTitle() + " User: "
-                                        + myModels.get(j).getUser())
-                                .setDefaults(Notification.DEFAULT_SOUND)
-                                .setContentIntent(pi)
-                                .setAutoCancel(true)
-                                .setStyle(new NotificationCompat.BigTextStyle().bigText(
-                                        myModels.get(j).getLinkTitle() + "\n User: "
-                                                + myModels.get(j).getUser()))
-                                .build();
-
-                        long i = new Date().getTime();
-                        NotificationManagerCompat managerCompat =
-                                NotificationManagerCompat.from(this);
-                        managerCompat.notify((int) i, notification);
-
-                        Log.i(TAG, "SP_myModels -- " + myModels.get(j).getLinkTitle() +
-                                " : " + myModels.get(j).getUser());
+                        myModelsFromShared.add(myModel);
+                        Log.i(TAG, "SP_MyModelFromShared -- " + myModel.getLinkTitle() +
+                                " : " + myModel.getUser());
                     }
+
+                    for (int j = 0; j < 5; j++) {
+                        if (!(myModelsFromShared.contains(myModels.get(j)))) {
+
+                            Resources resources = getResources();
+                            Intent notificationIntent = new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(myModels.get(j).getLink()));
+                            PendingIntent pi = PendingIntent.getActivity(this, 0,
+                                    notificationIntent, 0);
+
+                            Notification notification = new NotificationCompat.Builder(this)
+                                    .setTicker(resources.getString(R.string.new_topic_ps))
+                                    .setSmallIcon(R.mipmap.ic_launcher_ps)
+                                    .setContentTitle(resources.getString(R.string.new_topic_ps))
+                                    .setContentText(myModels.get(j).getLinkTitle() + " User: "
+                                            + myModels.get(j).getUser())
+                                    .setDefaults(Notification.DEFAULT_SOUND)
+                                    .setContentIntent(pi)
+                                    .setAutoCancel(true)
+                                    .setStyle(new NotificationCompat.BigTextStyle().bigText(
+                                            myModels.get(j).getLinkTitle() + "\n User: "
+                                                    + myModels.get(j).getUser()))
+                                    .build();
+
+                            long i = new Date().getTime();
+                            NotificationManagerCompat managerCompat =
+                                    NotificationManagerCompat.from(this);
+                            managerCompat.notify((int) i, notification);
+
+                            Log.i(TAG, "SP_myModels -- " + myModels.get(j).getLinkTitle() +
+                                    " : " + myModels.get(j).getUser());
+                        }
+                    }
+                    addModelToSharedPreferences(editor, myModels);
                 }
-                addModelToSharedPreferences(editor, myModels);
             }
+        } else {
+            Notification notification = new NotificationCompat.Builder(this)
+                    .setTicker("Not connected to internet")
+                    .setSmallIcon(R.mipmap.ic_launcher_ps)
+                    .setContentTitle("Not connected to internet")
+                    .setContentText("Please connect to internet")
+                    .setDefaults(Notification.DEFAULT_SOUND)
+                    .setAutoCancel(true)
+                    .build();
+
+            NotificationManagerCompat managerCompat =
+                    NotificationManagerCompat.from(this);
+            managerCompat.notify(1, notification);
         }
     }
 
@@ -141,16 +156,6 @@ public class PSIntentService extends IntentService {
         PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent,
                 PendingIntent.FLAG_NO_CREATE);
         return pendingIntent != null;
-    }
-
-    private boolean isNetworkAvailableAndConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-
-        boolean isNetworkAvailable = cm.getActiveNetworkInfo() != null;
-        boolean isNetworkConnected = isNetworkAvailable &&
-                cm.getActiveNetworkInfo().isConnected();
-
-        return isNetworkConnected;
     }
 
     private boolean didFirstMonitoring() {

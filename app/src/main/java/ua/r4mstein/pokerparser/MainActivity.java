@@ -3,6 +3,8 @@ package ua.r4mstein.pokerparser;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -130,7 +133,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     public class ParsingPSTask extends AsyncTask<String, Void, ArrayList<MyModel>> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -141,19 +143,28 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected ArrayList<MyModel> doInBackground(String... params) {
             ArrayList<MyModel> myModels = new ArrayList<>();
-            GetData.getDataFromPSLinks(params[0], myModels);
-
-            return myModels;
+            if (isConnected(getApplicationContext())) {
+                GetData.getDataFromPSLinks(params[0], myModels);
+                return myModels;
+            } else {
+                return null;
+            }
         }
 
         @Override
         protected void onPostExecute(ArrayList<MyModel> list) {
             super.onPostExecute(list);
             mModels.clear();
-            for (MyModel model: list) {
-                mModels.add(model);
+            if (list != null) {
+                for (MyModel model: list) {
+                    mModels.add(model);
+                }
+                deleteItemsFromList(mModels);
+            } else {
+                Toast.makeText(getApplicationContext(), "Not connected to internet",
+                        Toast.LENGTH_LONG).show();
             }
-            deleteItemsFromList(mModels);
+
             mRecyclerAdapter.notifyDataSetChanged();
             mRecyclerView.setAdapter(mRecyclerAdapter);
             mProgressBar.setVisibility(View.GONE);
@@ -172,9 +183,12 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected ArrayList<MyModel> doInBackground(String... params) {
             ArrayList<MyModel> my_Models = new ArrayList<>();
-            GetData.getDataFromGTLinks(params[0], my_Models);
-
-            return my_Models;
+            if (isConnected(getApplicationContext())) {
+                GetData.getDataFromGTLinks(params[0], my_Models);
+                return my_Models;
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -182,9 +196,15 @@ public class MainActivity extends AppCompatActivity
             super.onPostExecute(myModels);
             mProgressBar.setVisibility(View.GONE);
             mModels.clear();
-            for (MyModel model : myModels){
-                mModels.add(model);
+            if (myModels != null) {
+                for (MyModel model : myModels){
+                    mModels.add(model);
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "Not connected to internet",
+                        Toast.LENGTH_LONG).show();
             }
+
             mRecyclerAdapter.notifyDataSetChanged();
             mRecyclerView.setAdapter(mRecyclerAdapter);
         }
@@ -297,5 +317,12 @@ public class MainActivity extends AppCompatActivity
 
     public static Intent newIntent(Context context) {
         return new Intent(context, MainActivity.class);
+    }
+
+    public static boolean isConnected(Context context) {
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 }

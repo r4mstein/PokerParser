@@ -66,65 +66,79 @@ public class GTIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.i(TAG, "onHandleGT_Intent: " + intent);
 
-        if (intent != null) {
+        if (MainActivity.isConnected(getApplicationContext())) {
+            if (intent != null) {
 
-            myModels.clear();
-            GetData.getDataFromGTLinks(MainActivity.GT_LINK_1, myModels);
+                myModels.clear();
+                GetData.getDataFromGTLinks(MainActivity.GT_LINK_1, myModels);
 
-            mPreferences = getSharedPreferences(MODELS_FROM_GT_LINK1,
-                    getApplicationContext().MODE_PRIVATE);
-            SharedPreferences.Editor editor = mPreferences.edit();
+                mPreferences = getSharedPreferences(MODELS_FROM_GT_LINK1,
+                        getApplicationContext().MODE_PRIVATE);
+                SharedPreferences.Editor editor = mPreferences.edit();
 
-            if (didFirstMonitoring()) {
-                addModelToSharedPreferences(editor, myModels);
-                markNotFirstMonitoring();
-            } else {
-                myModelsFromShared.clear();
-                for (int i = 0; i < 5; i++) {
-                    String modelFromPref = mPreferences.getString(KEY_GT_LINK + i, null);
-                    MyModel myModel = MyModel.createMyModel(modelFromPref);
+                if (didFirstMonitoring()) {
+                    addModelToSharedPreferences(editor, myModels);
+                    markNotFirstMonitoring();
+                } else {
+                    myModelsFromShared.clear();
+                    for (int i = 0; i < 5; i++) {
+                        String modelFromPref = mPreferences.getString(KEY_GT_LINK + i, null);
+                        MyModel myModel = MyModel.createMyModel(modelFromPref);
 
-                    myModelsFromShared.add(myModel);
-                    Log.i(TAG, "GT_MyModelFromShared -- " + myModel.getLinkTitle() +
-                            " : " + myModel.getUser());
-                }
-
-                for (int j = 0; j < 5; j++) {
-                    if (!(myModelsFromShared.contains(myModels.get(j)))) {
-
-                        Resources resources = getResources();
-                        Intent notificationIntent = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(myModels.get(j).getLink()));
-                        PendingIntent pi = PendingIntent.getActivity(this, 0,
-                                notificationIntent, 0);
-
-                        Notification notification = new NotificationCompat.Builder(this)
-                                .setTicker(resources.getString(R.string.new_topic_gt))
-                                .setSmallIcon(R.mipmap.ic_launcher_gt)
-                                .setContentTitle(resources.getString(R.string.new_topic_gt))
-                                .setContentText(myModels.get(j).getLinkTitle() + "\n User: "
-                                        + myModels.get(j).getUser())
-                                .setDefaults(Notification.DEFAULT_SOUND)
-                                .setContentIntent(pi)
-                                .setAutoCancel(true)
-                                .setStyle(new NotificationCompat.BigTextStyle().bigText(
-                                        myModels.get(j).getLinkTitle() + "\n User: "
-                                                + myModels.get(j).getUser()))
-                                .build();
-
-                        long i = new Date().getTime();
-                        NotificationManagerCompat managerCompat =
-                                NotificationManagerCompat.from(this);
-                        managerCompat.notify((int) i, notification);
-
-                        Log.i(TAG, "GT_myModels -- " + myModels.get(j).getLinkTitle() +
-                                " : " + myModels.get(j).getUser());
+                        myModelsFromShared.add(myModel);
+                        Log.i(TAG, "GT_MyModelFromShared -- " + myModel.getLinkTitle() +
+                                " : " + myModel.getUser());
                     }
-                }
-                addModelToSharedPreferences(editor, myModels);
-            }
-        }
 
+                    for (int j = 0; j < 5; j++) {
+                        if (!(myModelsFromShared.contains(myModels.get(j)))) {
+
+                            Resources resources = getResources();
+                            Intent notificationIntent = new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(myModels.get(j).getLink()));
+                            PendingIntent pi = PendingIntent.getActivity(this, 0,
+                                    notificationIntent, 0);
+
+                            Notification notification = new NotificationCompat.Builder(this)
+                                    .setTicker(resources.getString(R.string.new_topic_gt))
+                                    .setSmallIcon(R.mipmap.ic_launcher_gt)
+                                    .setContentTitle(resources.getString(R.string.new_topic_gt))
+                                    .setContentText(myModels.get(j).getLinkTitle() + "\n User: "
+                                            + myModels.get(j).getUser())
+                                    .setDefaults(Notification.DEFAULT_SOUND)
+                                    .setContentIntent(pi)
+                                    .setAutoCancel(true)
+                                    .setStyle(new NotificationCompat.BigTextStyle().bigText(
+                                            myModels.get(j).getLinkTitle() + "\n User: "
+                                                    + myModels.get(j).getUser()))
+                                    .build();
+
+                            long i = new Date().getTime();
+                            NotificationManagerCompat managerCompat =
+                                    NotificationManagerCompat.from(this);
+                            managerCompat.notify((int) i, notification);
+
+                            Log.i(TAG, "GT_myModels -- " + myModels.get(j).getLinkTitle() +
+                                    " : " + myModels.get(j).getUser());
+                        }
+                    }
+                    addModelToSharedPreferences(editor, myModels);
+                }
+            }
+        } else {
+            Notification notification = new NotificationCompat.Builder(this)
+                    .setTicker("Not connected to internet")
+                    .setSmallIcon(R.mipmap.ic_launcher_gt)
+                    .setContentTitle("Not connected to internet")
+                    .setContentText("Please connect to internet")
+                    .setDefaults(Notification.DEFAULT_SOUND)
+                    .setAutoCancel(true)
+                    .build();
+
+            NotificationManagerCompat managerCompat =
+                    NotificationManagerCompat.from(this);
+            managerCompat.notify(2, notification);
+        }
     }
 
     private void addModelToSharedPreferences(SharedPreferences.Editor editor, ArrayList<MyModel> myModels) {
@@ -139,16 +153,6 @@ public class GTIntentService extends IntentService {
         PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent,
                 PendingIntent.FLAG_NO_CREATE);
         return pendingIntent != null;
-    }
-
-    private boolean isNetworkAvailableAndConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-
-        boolean isNetworkAvailable = cm.getActiveNetworkInfo() != null;
-        boolean isNetworkConnected = isNetworkAvailable &&
-                cm.getActiveNetworkInfo().isConnected();
-
-        return isNetworkConnected;
     }
 
     private boolean didFirstMonitoring() {
